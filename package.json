@@ -1,0 +1,33 @@
+{
+  "name": "webpack-use-source",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TinkerDeng/webpack-use-source.git"
+  },
+  "browerslist": [
+    "last 2 versions",
+    "IE 8",
+    "UCAndroid"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TinkerDeng/webpack-use-source/issues"
+  },
+  "homepage": "https://github.com/TinkerDeng/webpack-use-source#readme",
+  "devDependencies": {
+    "path": "^0.12.7",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1"
+  }
+}
