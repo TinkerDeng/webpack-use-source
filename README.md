@@ -27,19 +27,19 @@
 > loader 用于对模块的源代码进行转换
 
 ```javascript
-	/*
-		//console.log(this.context) // 当前处理的文件所在目录 d:\dfc\webpack-use-source\src
-      	//console.log(this.resource) // 当前处理文件的完整请求路径,包括querystring d:\dfc\webpack-use-source\src\index.js?name=1
-      	//console.log(this.resourceQuery);
-      	//console.log(this.resourcePath) // 当前处理文件的路径d:\dfc\webpack-use-source\src\index.js
-      	//console.log(this.request);//  当前文件的完整路径D:\dfc\webpack-use-source\loader\test-loader.js!D:\dfc\webpack-use-source\src\index.js
-      	//console.log(this.target) // 等于 Webpack 配置中的 Target
-      	//this.loadModule(request: string, callback: function(err, source, sourceMap, module)) //但 Loader 在处理一个文件时，如果依赖其它文件的处理结果才能得出当前文件的结果时， 就可以通过 去获得 request 对应文件的处理结果
-      	//this.addDependency(file:string) //给当前处理文件添加其依赖的文件，以便再其依赖的文件发生变化时，会重新调用 Loader 处理该文件
-      	//this.addContextDependency(directory:string) // 是把整个目录加入到当前正在处理文件的依赖中
-      	//this.clearDependencies() // 清除当前正在处理文件的所有依赖
-      	//this.emitFile(name:string,content:Buffer|string,sourceMap:{}) //输出一个文件
-    * /
+	/*	
+		console.log(this.context) // 当前处理的文件所在目录 d:\dfc\webpack-use-source\src
+      	console.log(this.resource) // 当前处理文件的完整请求路径,包括querystring d:\dfc\webpack-use-source\src\index.js?name=1
+      	console.log(this.resourceQuery);
+      	console.log(this.resourcePath) // 当前处理文件的路径d:\dfc\webpack-use-source\src\index.js
+      	console.log(this.request);//  当前文件的完整路径D:\dfc\webpack-use-source\loader\test-loader.js!D:\dfc\webpack-use-source\src\index.js
+      	console.log(this.target) // 等于 Webpack 配置中的 Target
+      	this.loadModule(request: string, callback: function(err, source, sourceMap, module)) //但 Loader 在处理一个文件时，如果依赖其它文件的处理结果才能得出当前文件的结果时， 就可以通过 去获得 request 对应文件的处理结果
+      	this.addDependency(file:string) //给当前处理文件添加其依赖的文件，以便再其依赖的文件发生变化时，会重新调用 Loader 处理该文件
+      	this.addContextDependency(directory:string) // 是把整个目录加入到当前正在处理文件的依赖中
+      	this.clearDependencies() // 清除当前正在处理文件的所有依赖
+      	this.emitFile(name:string,content:Buffer|string,sourceMap:{}) //输出一个文件
+    */
 	/*
 		1. 一个 Loader 其实就是一个 Node.js 模块，这个模块需要导出一个函数
 		2. loader运行在node中，所以可以调用任何自带的 API和第三方模块
@@ -50,7 +50,6 @@
 		7. 设置module.exports.raw = true来选择使用Buffer数据格式来传递数据
 		8. this.callback是Webpack 给 Loader 注入的 API,方便 Loader 和 Webpack 之间通信
 		9. webpack默认缓存所有loader的处理结果，如果文件或依赖的文件没有变化时，不会重新调用对应的 Loader 去执行转换操作的
-		10. 
 	*/
 	/*
 		调用自定义loader
@@ -61,52 +60,56 @@
                  'node_modules',
                  path.resolve(__dirname, 'loaders')
                ]
-             }
+            }
         方式三：npm link 专门用于开发和调试本地 Npm 模块,能做到在不发布模块的情况下，把本地的一个正在开发的模块的源码链接到项目的 node_modules 目录下
 	*/
 	
-	/**
-	* demo1 html-layout-loader
+	/*
+	demo1 html-layout-loader
 	*/
-	const loaderUtils = require('loader-utils'); // 提供了许多有用的工具 
-	const validateOptions = require('schema-utils'); // 验证loader配置
-	const schema = {
-      type: 'object',
-      properties: {
-        test: {
-          type: 'string'
-        }
-      }
-    };
-	module.exports = function (source) {
-      const options = loaderUtils.getOptions(this) // 获取配置loader的参数
-      validateOptions(schema,options,"example loader");
-      const layoutHtml = fs.readFileSync(options.layout, 'utf-8')
-      return layoutHtml.replace('{{__content__}}', source)
-    }
-    
-	/**
-	* demo2: sass转换成css
+		const loaderUtils = require('loader-utils'); // 提供了许多有用的工具 
+		const validateOptions = require('schema-utils'); // 验证loader配置
+		const schema = {
+	        type: 'object',
+	        properties: {
+	            test: {
+	                type: 'string'
+	            }
+	        }
+		};
+		module.exports = function (source) {
+	        const options = loaderUtils.getOptions(this) // 获取配置loader的参数
+	        validateOptions(schema,options,"example loader");
+	        const layoutHtml = fs.readFileSync(options.layout, 'utf-8')
+	        return layoutHtml.replace('{{__content__}}', source)
+	    }
+	    
+	/*
+		demo2: sass转换成css
 	*/
 	    const sass = require('node-sass');
 	    module.exports = function(source) {
-	      return sass(source);
+	       return sass(source);
 	    };
 	    
-	/*demo3:除了需要转换source代码以外，还需要转换sourceMaps源码，以方便调试*/
+	/*
+		demo3:除了需要转换source代码以外，还需要转换sourceMaps源码，以方便调试
+	*/
 		module.exports = function(source) {
-	      // 通过 this.callback 告诉 Webpack 返回的结果
-	      this.callback(
-	          null, // Error | null   当无法转换原内容时，给 Webpack 返回一个 Error 
-	          source, // 原内容转换后的内容
-	          sourceMaps, // 用于把转换后的内容得出原内容的 Source Map，方便调试
-	          abstractSyntaxTree?: AST // 如果本次转换为原内容生成了 AST 语法树，可以把这个 AST 返回,以方便之后需要 AST 的 Loader 复用该 AST，以避免重复生成 AST，提升性能
-	      );
-	      // 当你使用 this.callback 返回内容时，该 Loader 必须返回 undefined，
-	      // 以让 Webpack 知道该 Loader 返回的结果在 this.callback 中，而不是 return 中 
-	      return;
+	      	// 通过 this.callback 告诉 Webpack 返回的结果
+	      	this.callback(
+	          	null, // Error | null   当无法转换原内容时，给 Webpack 返回一个 Error 
+	          	source, // 原内容转换后的内容
+	          	sourceMaps, // 用于把转换后的内容得出原内容的 Source Map，方便调试
+	          	abstractSyntaxTree?: AST // 如果本次转换为原内容生成了 AST 语法树，可以把这个 AST 返回,以方便之后需要 AST 的 Loader 复用该 AST，以避免重复生成 AST，提升性能
+	      	);
+	      	// 当你使用 this.callback 返回内容时，该 Loader 必须返回 undefined，
+	      	// 以让 Webpack 知道该 Loader 返回的结果在 this.callback 中，而不是 return 中 
+	      	return;
 	    };
-	/*demo4:异步转换*/
+	/*
+		demo4:异步转换
+	*/
 		module.exports = function(source) {
 	        // 告诉 Webpack 本次转换是异步的，Loader 会在 callback 中回调结果
 	        var callback = this.async();
@@ -115,7 +118,9 @@
 	            callback(err, result, sourceMaps, ast);
 	        });
 	    };
-	/*demo5：处理二进制数据*/
+	/*
+		demo5：处理二进制数据
+	*/
 		module.exports = function(source) {
             // 在 exports.raw === true 时，Webpack 传给 Loader 的 source 是 Buffer 类型的
             source instanceof Buffer === true;
@@ -125,6 +130,7 @@
         };
         // 通过 exports.raw 属性告诉 Webpack 该 Loader 是否需要二进制数据 
         module.exports.raw = true;
+        
     /*demo5:关闭loader的缓存功能*/
 	    module.exports = function(source) {
 	      // 关闭该 Loader 的缓存功能
@@ -144,7 +150,7 @@
 	    };
 ```
 
-#### 配置s
+#### 配置
 
 ```javascript
 	const webpack = require("webpack");
@@ -166,7 +172,7 @@
             library: 'test-web-app', // 指定的就是你使用require时的模块名
             libraryTarget: 'commonjs2', // node端要设置打包出来的js使用模块化的方案 umd cmd amd
             umdNamedDefine: true // 会对 UMD 的构建过程中的 AMD 模块进行命名。否则就使用匿名的 define
-        },
+  		},
 	    mode:"development",
 	    target:"node", // 打包出来的内容适配哪个执行环境 web node async-node webworker
 	    devServer: { //webpack-dev-server输出的文件只存在于内存中,不输出真实的文件
@@ -191,31 +197,33 @@
         resolve:{ // 省略后缀名
 	        modules:["./src/module","node_modules"], //寻找第三方模块，默认只会去node_modules下找
 	        extensions:[".js",".jsx",".css",".scss",".less"],
-	         alias: {//别名来把原来导入路径映射成一个新的导入路径
-                com: './src/components/' 
-	         }
+	        alias: {//别名来把原来导入路径映射成一个新的导入路径
+				com: './src/components/' 
+	        }
         },
     	module:{ // loader 用于转换某些类型的模块
-    	    rules:[{
-				 "test" : /\.css$/,
-		         "use" : ["style-loader", "css-loader","postcss-loader"]
-    	    },
-    	    {
-	            "test": /\.(png|svg|jpg|gif)$/, // 加载图片
-	            "use": [{
-	                loader: 'url-loader',
-	                options: {
-	                    limit: 8192,  // 小于8k的图片自动转成base64格式
-	                    name: 'images/[name].[ext]?[hash]', // 图片打包后存放的目录
-	                    publicPath: '../'  // css图片引用地址，可修正打包后，css图片引用出错的问题
-	                }
+    	    rules:[
+    	        {
+				 	"test" : /\.css$/,
+		         	"use" : ["style-loader", "css-loader","postcss-loader"]
+    	    	},
+    	    	{
+	           	 	"test": /\.(png|svg|jpg|gif)$/, // 加载图片
+	            	"use": [{
+	                	loader: 'url-loader',
+	                	options: {
+	                    	limit: 8192,  // 小于8k的图片自动转成base64格式
+	                    	name: 'images/[name].[ext]?[hash]', // 图片打包后存放的目录
+	                    	publicPath: '../'  // css图片引用地址，可修正打包后，css图片引用出错的问题
+	                	}
+	            	}]
+	        	},
+		        {
+		            test: /\.(woff|woff2|eot|ttf|otf)$/,
+		            use: [
+		                'file-loader'
+		            ]
 	            }]
-	        },{
-	              test: /\.(woff|woff2|eot|ttf|otf)$/,
-	              use: [
-	              'file-loader'
-	              ]
-    	    }]
     	},
     	plugins:[ // 打包 优化 压缩 重新定义环节中的变量
     	    new HtmlWebpakPlugin({
