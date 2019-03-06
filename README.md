@@ -195,14 +195,21 @@
             open:true//自动打开浏览器
         },
         resolve:{ // 省略后缀名
-	        modules:["./src/module","node_modules"], //寻找第三方模块，默认只会去node_modules下找
+	        modules:["./src/module",path.resolve(__dirname,"node_modules")], //寻找第三方模块，默认只会去node_modules下找
 	        extensions:[".js",".jsx",".css",".scss",".less"],
 	        alias: {//别名来把原来导入路径映射成一个新的导入路径
 				com: './src/components/' 
-	        }
+	        },
+	        mainFields:["browswer","module","main"]
         },
     	module:{ // loader 用于转换某些类型的模块
     	    rules:[
+    	        {
+    	          	"test":/\.js/,
+    	          	"use":['babel-loader?cacheDirectory'],
+    	          	"include":path.resolve(__dirname,'src'),  
+    	          	"exclude":/node_modules/
+    	        },
     	        {
 				 	"test" : /\.css$/,
 		         	"use" : ["style-loader", "css-loader","postcss-loader"]
