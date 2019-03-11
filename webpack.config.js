@@ -1,17 +1,14 @@
 const path = require("path");
 const webpack = require("webpack");
+const config =require("./config1.js");
 module.exports = {
     "mode":"none",
-    entry:'./src/index.js',               // 入口文件
+    context:path.resolve("src"),
+    entry:'./index.js',               // 入口文件
     output:{
-        filename:"[name].[hash].js",
+        filename:"[id].[name].[hash].js",
         path:path.join(__dirname, "dist")
     },
     module:{
-        rules:[
-            {
-                test:/\.js/,
-                loader:path.resolve(__dirname, "loader", 'test-loader.js'),
-            }]
     }
 };

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    const arr1 = [1,2,3,4];
+    const arr2 =[4,1,2,3]
+    function sort(str) {
+        let arr = Array.from(str);
+        let middle = arr.length / 2 - 1;
+        let newArr = [];
+        let top = 0;
+        for (let i = 0; i <= middle; i++) {
+            newArr[top++] = arr[i];
+        }
+
+        middle = arr.length % 2 == 0 ? Math.floor(middle + 1) : Math.floor(middle + 2);
+
+        console.log(middle)
+        for (let j = middle; j < arr.length; j++) {
+            if (newArr[top - 1] !== arr[j]) {
+                break;
+            }
+            top--;
+        }
+        return top <= 0 ? true : false
+    }
+
+    console.log(sort(arr1,arr2));
+</script>
+</body>
+</html>
