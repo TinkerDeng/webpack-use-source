@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server",
     "babel": "babel test.js",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "css-loader": "^2.1.0",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
+    "node-notifier": "^5.4.0",
     "path": "^0.12.7",
     "style-loader": "^0.23.1",
     "webpack": "^4.29.6",

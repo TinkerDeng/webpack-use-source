@@ -25,8 +25,8 @@
 	{
 		"context": "path.resolve(__dirname,'src')",
         "entry":"./src/js 只有一个入口文件" ,
-        "entry":["./src/index.js","./src/test.js","将多个入口文件生成一个文件"],
-        "entry":{"a":"./src/index.js","b":"./src/test.js","c":"则会生成多个入口"} 
+        "entry":["./src/index.js","./src/flow.js","将多个入口文件生成一个文件"],
+        "entry":{"a":"./src/index.js","b":"./src/flow.js","c":"则会生成多个入口"} 
 	}
 ```
 
@@ -270,4 +270,46 @@
 
 1. plugin通过在构建流程中注入钩子来扩展webpack功能
 1. 每一项都是插件的一个实例，通过构造函数注入配置信息
+1. 启动插件时，既插件类被实例化，同时调用类的apply的方法,apply方法接收compiler参数
+1. compiler指向当前webpack的实例（包含了webpack的所有entry,options，loaders，plugins的配置信息),我们可以通过它访问整个webpack环境
+1. compilation包含了每次 build 后的详细信息，包括编译出的结果、错误信息、模块、编译后的资源、改变的文件和依赖等的当前状态
+1. 同时compilation提供了很多的事件挂钩，以便于插件来执行一些黑魔法
+
+##### plugin条件
+
+1. 是一个独立的模块 
+1. 模块对外暴露一个类
+1. 在改类的原型上定义一个注入了compiler对象的apply方法
+1. apply方法中compiler对象上挂载有 webpack 事件钩子
+1. 钩子的回调中能拿到当前编译的 compilation 对象，如果是异步编译插件的话可以拿到回调 callback
+1. 完成自定义子编译流程并处理 complition 对象的内部数据
+1. 如果异步编译插件的话，数据处理完成后执行 callback 回调
+
+##### 案例
+
+```javascript
+	const notifier = require("node-notifier");
+    const pkg = require('../package.json')
+    class Notifier {
+        apply(compiler) {
+            if (compiler.hooks) { //webpack > 4
+                compiler.hooks.done.tapAsync("test", this.uploadFiles.bind(this));
+            } else { //webpack<4
+                compiler.plugin("done", this.uploadFiles.bind(this));
+            }
+        }
+    
+        uploadFiles(stats,callback) {
+            const time = ((stats.endTime - stats.startTime) / 1000).toFixed(2);
+            notifier.notify({
+                title:pkg.name,
+                message:`打包完成\n发现${stats.compilation.errors.length}个错误，用时${time}s`
+            });
+            return callback();
+        }
+    }
+    
+    module.exports = Notifier;
+
+```
 

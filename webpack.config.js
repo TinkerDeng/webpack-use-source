@@ -1,6 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
-const config =require("./config1.js");
+const Notifier = require('./plugin/notifier.js');
 module.exports = {
     "mode":"none",
     context:path.resolve("src"),
@@ -9,6 +9,8 @@ module.exports = {
         filename:"[id].[name].[hash].js",
         path:path.join(__dirname, "dist")
     },
-    module:{
-    }
+    module:{},
+    plugins:[
+        new Notifier()
+    ]
 };
